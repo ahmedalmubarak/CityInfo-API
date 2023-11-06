@@ -46,7 +46,10 @@ namespace CityInfo.api.Controllers
         [HttpPost]
         public ActionResult<PointOfInterestDto> CreatePointOfInterest(int cityId, PointOfInterestForCreationDto pointOfInterest)
         {
-
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
             var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
             if (city == null)
             {
@@ -73,6 +76,28 @@ namespace CityInfo.api.Controllers
                      pointOfInterestId = finalPointOfInterest.Id
                  },
                  finalPointOfInterest);
+
+        }
+
+        [HttpPut("{pointofinterestid}")]
+        public ActionResult<PointOfInterestDto> UpdatePointOfInterest(int cityId, int pointofinterestid,
+            PointOfInterestForUpdateDto pointOfInterest)
+        {
+            var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+            if (city == null)
+            {
+                return NotFound();
+            }
+            var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(p => p.Id == pointofinterestid);
+
+            if (pointOfInterestFromStore == null)
+            {
+                return NotFound();
+            }
+            pointOfInterestFromStore.Name = pointOfInterest.Name;
+            pointOfInterestFromStore.Description = pointOfInterest.Description;
+
+            return NoContent();
 
         }
 
